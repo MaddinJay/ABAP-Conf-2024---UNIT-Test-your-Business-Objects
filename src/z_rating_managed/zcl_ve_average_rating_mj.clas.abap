@@ -15,11 +15,16 @@ CLASS zcl_ve_average_rating_mj DEFINITION
         average_rating TYPE z_c_product_m_mj-AverageRating,
       END OF ty_average_product_rating,
 
-      tt_average_product_ratings TYPE STANDARD TABLE OF ty_average_product_rating WITH DEFAULT KEY.
+      tt_average_product_ratings TYPE STANDARD TABLE OF ty_average_product_rating WITH DEFAULT KEY,
+
+      tt_ratings                 TYPE TABLE FOR READ RESULT z_c_product_m_mj\\product\_rating.
 
     METHODS map_average_ratings2products IMPORTING average_product_ratings TYPE tt_average_product_ratings
                                                    products                TYPE ty_products
                                          RETURNING VALUE(result)           TYPE ty_products.
+
+    METHODS read_average_rating4products IMPORTING ratings       TYPE tt_ratings
+                                         RETURNING VALUE(result) TYPE zcl_ve_average_rating_mj=>tt_average_product_ratings.
 
 ENDCLASS.
 
@@ -39,17 +44,21 @@ CLASS zcl_ve_average_rating_mj IMPLEMENTATION.
       RESULT FINAL(ratings).
 
     " Calculate the average rating for each product by DB select
-    SELECT Product,
-           AVG( rating AS DEC( 2, 1 ) ) AS average_rating
-      FROM @ratings AS r
-      GROUP BY Product
-      INTO TABLE @average_product_ratings.
+    average_product_ratings = read_average_rating4products( ratings ).
 
     " Map average ratings to the products (output)
     products = map_average_ratings2products( average_product_ratings = average_product_ratings
                                              products                = products ).
 
     ct_calculated_data = CORRESPONDING #( products ).
+  ENDMETHOD.
+
+  METHOD read_average_rating4products.
+    SELECT Product,
+           AVG( rating AS DEC( 2, 1 ) ) AS average_rating
+      FROM @ratings AS r
+      GROUP BY Product
+      INTO TABLE @result.
   ENDMETHOD.
 
   METHOD map_average_ratings2products.
