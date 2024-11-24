@@ -1,0 +1,112 @@
+@Metadata.layer: #CORE
+annotate view Z_C_RatingReadOnly with
+{
+  @UI.facet: [{
+    targetQualifier: 'fRating',
+    purpose: #HEADER,
+    type:#IDENTIFICATION_REFERENCE,
+    label: 'Bewertung',
+    position: 10
+   },
+   {
+    targetQualifier: 'fCustomer',
+    purpose: #STANDARD,
+    type: #IDENTIFICATION_REFERENCE,
+    label:'Kunde',
+    position: 20
+   },
+   {
+    targetQualifier: 'fReview',
+    purpose: #STANDARD,
+    type: #IDENTIFICATION_REFERENCE,
+    label:'Review',
+    position: 30
+   }
+   ]
+  @UI.hidden: true
+  RatingUuid;
+  @UI: {
+    selectionField: [{
+      position: 10
+    }],
+    identification: [{
+      label: 'Produkt',
+      position: 10,
+      qualifier: 'fRating'
+     }],
+    lineItem: [{
+      label: 'Produkt',
+      type: #STANDARD,
+      importance: #HIGH,
+      position: 10
+      }]
+  }
+  @Search.defaultSearchElement: true
+  @Search.fuzzinessThreshold: 0.8
+  @Consumption.valueHelpDefinition: [{
+    entity: {
+      name:'Z_C_Product_ReadOnly',
+      element: 'ProductId'
+    }
+  }]
+  Product;
+  @UI: {
+    identification: [{
+      position: 10,
+      label: 'Name',
+      qualifier: 'fCustomer'
+    }],
+    lineItem: [{
+      label: 'Name',
+      type: #STANDARD,
+      importance: #MEDIUM,
+      position: 30
+      }]
+  }
+  @Search.defaultSearchElement: true
+  @Search.fuzzinessThreshold: 0.8
+  Name;
+  @UI: {
+    identification: [{
+      position: 20,
+      label: 'Email',
+      qualifier: 'fCustomer'
+     }],
+    lineItem: [{
+    label: 'Email',
+    type: #STANDARD,
+    importance: #MEDIUM,
+    position: 40
+    }]
+  }
+  @Search.defaultSearchElement: true
+  @Search.fuzzinessThreshold: 0.8
+  Email;
+  @UI: {
+    identification: [{
+      position: 20,
+      label: 'Bewertung',
+      qualifier: 'fRating'
+     }],
+    lineItem: [{
+        label: 'Bewertung',
+        type: #AS_DATAPOINT,
+        importance: #HIGH,
+        position: 20
+        }],
+    dataPoint: {
+        targetValue: 5,
+        visualization: #RATING,
+        qualifier: 'Rating'
+        }
+  }
+  Rating;
+  @UI:{
+   identification: [{
+      position: 10,
+      label: 'Review',
+      qualifier: 'fReview'
+     }]
+  }
+  Review;
+}
