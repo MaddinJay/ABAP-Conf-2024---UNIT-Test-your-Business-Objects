@@ -1,4 +1,5 @@
-CLASS lhc_rating DEFINITION INHERITING FROM cl_abap_behavior_handler.
+CLASS ltcl_i_product_mj DEFINITION DEFERRED FOR TESTING.
+CLASS lhc_rating DEFINITION INHERITING FROM cl_abap_behavior_handler FRIENDS ltcl_i_product_mj.
 
   PRIVATE SECTION.
 
