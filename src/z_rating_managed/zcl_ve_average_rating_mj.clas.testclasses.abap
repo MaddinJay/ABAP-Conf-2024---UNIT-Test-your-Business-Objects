@@ -1,3 +1,6 @@
+CLASS ltcl_average_rating DEFINITION DEFERRED.
+CLASS zcl_ve_average_rating_mj DEFINITION LOCAL FRIENDS ltcl_average_rating.
+
 CLASS ltcl_average_rating DEFINITION FINAL FOR TESTING
   DURATION SHORT
   RISK LEVEL HARMLESS.
@@ -6,7 +9,6 @@ CLASS ltcl_average_rating DEFINITION FINAL FOR TESTING
     CLASS-DATA:
       cds_test_environment TYPE REF TO if_cds_test_environment,
       sql_test_environment TYPE REF TO if_osql_test_environment,
-      products             TYPE STANDARD TABLE OF ZProduct_MJ,
       ratings              TYPE STANDARD TABLE OF zrating_mj.
 
     DATA:
@@ -38,17 +40,16 @@ CLASS ltcl_average_rating IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD should_calculate_correctly.
-    DATA products        TYPE STANDARD TABLE OF Z_C_Product_M_MJ WITH DEFAULT KEY.
-    DATA calculated_data TYPE STANDARD TABLE OF Z_C_Product_M_MJ WITH DEFAULT KEY.
-    DATA expected_values TYPE STANDARD TABLE OF Z_C_Product_M_MJ WITH DEFAULT KEY.
-
     " Set Input Data
-    products        = VALUE #( ( ProductId = 'DXTR1000' ProductDescription = 'Deluxe Touring Bike Black'   AverageRating = 0 ) ).
+    DATA(products)        = VALUE zcl_ve_average_rating_mj=>tt_products(
+                              ( ProductId = 'DXTR1000' ProductDescription = 'Deluxe Touring Bike Black'   AverageRating = 0 ) ).
 
-    calculated_data = VALUE #( ( ProductId = 'DXTR1000' ProductDescription = 'Deluxe Touring Bike Black'   AverageRating = 4 ) ).
+    DATA(calculated_data) = VALUE zcl_ve_average_rating_mj=>tt_products(
+                              ( ProductId = 'DXTR1000' ProductDescription = 'Deluxe Touring Bike Black'   AverageRating = 4 ) ).
 
     " Set Expected Result
-    expected_values = VALUE #( ( ProductId = 'DXTR1000' ProductDescription = 'Deluxe Touring Bike Black'   AverageRating = '4.5' ) ).
+    DATA(expected_values) = VALUE zcl_ve_average_rating_mj=>tt_products(
+                              ( ProductId = 'DXTR1000' ProductDescription = 'Deluxe Touring Bike Black'   AverageRating = '4.5' ) ).
 
     " Execute calculation
     cut->calculate( EXPORTING it_original_data           = products
@@ -65,7 +66,7 @@ CLASS ltcl_average_rating IMPLEMENTATION.
   METHOD class_setup.
     " create the test doubles for the underlying CDS entities
     cds_test_environment = cl_cds_test_environment=>create(
-                      i_for_entity = 'Z_C_RATING_M_MJ'
+                      i_for_entity      = 'Z_C_RATING_M_MJ'
                       i_dependency_list = VALUE #( ( name = 'ZRATING_MJ'  type = 'TABLE' ) ) ).
 
     ratings = VALUE #( ( rating_uuid = '1' product = 'DXTR1000' rating = 4 )

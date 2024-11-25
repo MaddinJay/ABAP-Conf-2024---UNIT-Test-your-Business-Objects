@@ -31,9 +31,7 @@ CLASS zcl_ve_average_rating_mj IMPLEMENTATION.
   METHOD if_sadl_exit_calc_element_read~calculate.
     DATA(products) = CORRESPONDING tt_products( it_original_data ).
 
-    DATA(average_product_ratings) = read_average_rating4products( products ).
-
-    products = map_average_ratings2products( average_product_ratings = average_product_ratings
+    products = map_average_ratings2products( average_product_ratings = read_average_rating4products( products )
                                              products                = products ).
 
     ct_calculated_data = CORRESPONDING #( products ).
