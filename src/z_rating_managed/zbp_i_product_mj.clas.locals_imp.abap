@@ -10,7 +10,6 @@ CLASS lhc_rating DEFINITION INHERITING FROM cl_abap_behavior_handler FRIENDS ltc
         completed         TYPE i VALUE 30,
       END OF rating_status.
 
-
     METHODS check_email FOR VALIDATE ON SAVE
       IMPORTING keys FOR rating~checkemail.
     METHODS check_rating FOR VALIDATE ON SAVE
@@ -25,6 +24,11 @@ CLASS lhc_rating DEFINITION INHERITING FROM cl_abap_behavior_handler FRIENDS ltc
       IMPORTING keys FOR rating~setstatuscustomerfeedback.
     METHODS get_instance_features FOR INSTANCE FEATURES
       IMPORTING keys REQUEST requested_features FOR rating RESULT result.
+    METHODS is_rating_valid
+      IMPORTING
+        rating        TYPE ze_rating
+      RETURNING
+        value(result) TYPE abap_bool.
 
 ENDCLASS.
 
@@ -65,7 +69,7 @@ CLASS lhc_rating IMPLEMENTATION.
         RESULT DATA(ratings).
 
     LOOP AT ratings ASSIGNING FIELD-SYMBOL(<rating>).
-      IF <rating>-rating < 0 OR <rating>-rating > 5.
+      IF is_rating_valid( <rating>-rating ) = abap_false.
         APPEND VALUE #( %key = <rating>-%key ) TO failed-rating.
 
         APPEND VALUE #( %key = <rating>-%key
@@ -172,6 +176,11 @@ CLASS lhc_rating IMPLEMENTATION.
                         COND #( WHEN rating-Status = 30
                                 THEN if_abap_behv=>fc-o-disabled ELSE if_abap_behv=>fc-o-enabled   )
                    ) ).
+  ENDMETHOD.
+
+
+  METHOD is_rating_valid.
+    result = xsdbool( rating >= 1 AND rating <= 5 ).
   ENDMETHOD.
 
 ENDCLASS.
