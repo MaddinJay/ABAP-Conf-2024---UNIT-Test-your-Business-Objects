@@ -41,13 +41,13 @@ CLASS zcl_ve_average_rating_mj IMPLEMENTATION.
 
   METHOD read_average_rating4products.
     " Read the ratings for the product(s) from the Z_C_Product_M_MJ entity
-    READ ENTITIES OF Z_C_Product_M_MJ
+    READ ENTITIES OF z_c_product_m_mj
       ENTITY Product BY \_Rating
       FIELDS ( Rating )
       WITH CORRESPONDING #( products )
       RESULT FINAL(ratings).
 
-    " Calculate the average rating for each product by DB selec
+    " Calculate the average rating for each product by DB select
     SELECT Product,
            AVG( rating AS DEC( 2, 1 ) ) AS average_rating
       FROM @ratings AS r
@@ -59,7 +59,7 @@ CLASS zcl_ve_average_rating_mj IMPLEMENTATION.
     result = products.
 
     LOOP AT result ASSIGNING FIELD-SYMBOL(<product>).
-      <product>-AverageRating = average_product_ratings[ Product = <product>-ProductId ]-average_rating.
+      <product>-AverageRating = VALUE #( average_product_ratings[ Product = <product>-ProductId ]-average_rating OPTIONAL ).
     ENDLOOP.
   ENDMETHOD.
 
